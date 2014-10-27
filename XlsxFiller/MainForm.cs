@@ -11,10 +11,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace XlsxFiller
+namespace SiteDataFiller
 {
     public partial class MainForm : Form
     {
+        private const string XLSX = ".xlsx";
+
         public MainForm()
         {
             InitializeComponent();
@@ -78,7 +80,7 @@ namespace XlsxFiller
                     File.WriteAllText(filePath, j.Value);
                 }
 
-                if (DialogResult.Yes == MessageBox.Show("To Mićo, care!\n\nDa li želiš da zatvoriš aplikaciju?", "Successful", MessageBoxButtons.YesNo))
+                if (DialogResult.Yes == MessageBox.Show("Site data successfully exported.\n\r\n\rDo you want to close the aplication?", "Success", MessageBoxButtons.YesNo))
                 {
                     this.Close();
                 }
@@ -87,6 +89,51 @@ namespace XlsxFiller
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void txtSourceFile_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop, false))
+                e.Effect = DragDropEffects.All;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void txtSourceFile_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            string file = files.FirstOrDefault();
+
+            if (false == File.Exists(file)
+                || new FileInfo(file).Extension.ToLower() != XLSX)
+            {
+                MessageBox.Show("File type should be .xlsx.");
+                return;
+            }
+
+            txtSourceFile.Text = file;
+        }
+
+        private void txtDestinationFolder_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop, false))
+                e.Effect = DragDropEffects.All;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void txtDestinationFolder_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] dirs = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            string dir = dirs.FirstOrDefault();
+
+            if (false == Directory.Exists(dir))
+            {
+                MessageBox.Show("You should provide an existing directory path.");
+                return;
+            }
+
+            txtDestinationFolder.Text = dir;
         }
 
     }

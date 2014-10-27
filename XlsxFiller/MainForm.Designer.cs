@@ -1,4 +1,4 @@
-﻿namespace XlsxFiller
+﻿namespace SiteDataFiller
 {
     partial class MainForm
     {
@@ -48,10 +48,13 @@
             // 
             // txtSourceFile
             // 
+            this.txtSourceFile.AllowDrop = true;
             this.txtSourceFile.Location = new System.Drawing.Point(12, 25);
             this.txtSourceFile.Name = "txtSourceFile";
             this.txtSourceFile.Size = new System.Drawing.Size(379, 20);
             this.txtSourceFile.TabIndex = 1;
+            this.txtSourceFile.DragDrop += new System.Windows.Forms.DragEventHandler(this.txtSourceFile_DragDrop);
+            this.txtSourceFile.DragEnter += new System.Windows.Forms.DragEventHandler(this.txtSourceFile_DragEnter);
             // 
             // btnBrowseFile
             // 
@@ -74,10 +77,13 @@
             // 
             // txtDestinationFolder
             // 
+            this.txtDestinationFolder.AllowDrop = true;
             this.txtDestinationFolder.Location = new System.Drawing.Point(12, 79);
             this.txtDestinationFolder.Name = "txtDestinationFolder";
             this.txtDestinationFolder.Size = new System.Drawing.Size(379, 20);
             this.txtDestinationFolder.TabIndex = 4;
+            this.txtDestinationFolder.DragDrop += new System.Windows.Forms.DragEventHandler(this.txtDestinationFolder_DragDrop);
+            this.txtDestinationFolder.DragEnter += new System.Windows.Forms.DragEventHandler(this.txtDestinationFolder_DragEnter);
             // 
             // btnBrowseFolder
             // 
