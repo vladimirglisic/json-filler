@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.IO;
@@ -16,6 +17,8 @@ namespace SiteDataFiller
     public partial class MainForm : Form
     {
         private const string XLSX = ".xlsx";
+        private const string SOURCE = "src";
+        private const string DESTINATION = "dst";
 
         public MainForm()
         {
@@ -24,7 +27,8 @@ namespace SiteDataFiller
 
         private void MailForm_Load(object sender, EventArgs e)
         {
-            
+            txtSourceFile.Text = ConfigurationManager.AppSettings[SOURCE];
+            txtDestinationFolder.Text = ConfigurationManager.AppSettings[DESTINATION];
         }
 
         private void btnBrowseFile_Click(object sender, EventArgs e)
@@ -54,16 +58,16 @@ namespace SiteDataFiller
 
         private void btnExport_Click(object sender, EventArgs e)
         {
-            string sourceData = txtSourceFile.Text;
-            string outputFolder = txtDestinationFolder.Text;
+            string sourcePath = txtSourceFile.Text;
+            string outputPath = txtDestinationFolder.Text;
 
-            if (string.IsNullOrEmpty(sourceData))
+            if (string.IsNullOrEmpty(sourcePath))
             {
                 MessageBox.Show("Please enter source data file location.");
                 return;
             }
 
-            if (string.IsNullOrEmpty(outputFolder))
+            if (string.IsNullOrEmpty(outputPath))
             {
                 MessageBox.Show("Please enter destination folder location.");
                 return;
@@ -71,12 +75,15 @@ namespace SiteDataFiller
 
             try
             {
+                UpdateAppSettings(SOURCE, sourcePath);
+                UpdateAppSettings(DESTINATION, outputPath);
+
                 var filler = new Filler();
-                var json = filler.GetJson(sourceData);
+                var json = filler.GetJson(sourcePath);
 
                 foreach (var j in json)
                 {
-                    string filePath = string.Format(@"{0}\{1}.json", outputFolder, j.Key);
+                    string filePath = string.Format(@"{0}\{1}.json", outputPath, j.Key);
                     File.WriteAllText(filePath, j.Value);
                 }
 
@@ -88,6 +95,29 @@ namespace SiteDataFiller
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+        }
+
+        private static void UpdateAppSettings(string key, string value)
+        {
+            try
+            {
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+                if (false == config.AppSettings.Settings.AllKeys.Contains(key))
+                {
+                    config.AppSettings.Settings.Add(key, value);
+                }
+                else
+                {
+                    config.AppSettings.Settings[key].Value = value;
+                }
+
+                config.Save(ConfigurationSaveMode.Full);
+            }
+            catch (Exception ex)
+            {
+            
             }
         }
 
