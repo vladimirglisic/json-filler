@@ -13,21 +13,24 @@ namespace SiteDataFiller
         public void AddJsonDataType(JsonDataType type)
         {
             myJsonDataTypes.Add(type);
+        }
 
-            if (false == type.HasParent) return;
+        public void MakeLinkToParent(JsonDataType childType)
+        {
+            if (false == childType.HasParent) return;
 
-            JsonDataType parentType = myJsonDataTypes.Single(t => t.Name == type.ParentName);
+            JsonDataType parentType = myJsonDataTypes.SingleOrDefault(t => t.Name == childType.ParentName);
 
             foreach (var p in parentType.Entities)
             {
-                p.Data[type.ParentFieldName] = new List<JsonData>();
+                p.Data[childType.ParentFieldName] = new List<JsonData>();
             }
 
-            foreach (var e in type.Entities)
+            foreach (var childEntity in childType.Entities)
             {
-                var parent = parentType.GetById(e.ParentId);
+                var parentEntity = parentType.GetById(childEntity.ParentId);
 
-                (parent.Data[type.ParentFieldName] as List<JsonData>).Add(e);
+                (parentEntity.Data[childType.ParentFieldName] as List<JsonData>).Add(childEntity);
             }
         }
 

@@ -21,6 +21,11 @@ namespace SiteDataFiller
                 myRep.AddJsonDataType(type);
             }
 
+            foreach (var type in myRep.GetAllJsonDataTypes())
+            {
+                myRep.MakeLinkToParent(type);
+            }
+
             var json = new Dictionary<string, string>();
             foreach (var type in myRep.GetAllJsonDataTypes().Where(t => false == t.HasParent))
             {
