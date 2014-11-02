@@ -69,6 +69,8 @@ namespace SiteDataFiller
             for (int i = 2; i < worksheet.Rows.Count(); i++)
             {
                 var currRow = worksheet.Rows[i];
+                if (currRow.CellCount() == 0) continue;
+
                 var currDict = new Dictionary<string, object>();
 
                 for (int j = 0; j < keyRow.CellCount(); j++)

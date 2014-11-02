@@ -11,8 +11,8 @@ namespace SiteDataFiller
     {
         public static int CellCount(this Row row)
         {
-            int retVal = row.Cells.Any(c => c != null)
-                ? row.Cells.Where(c => c != null).Max(c => c.ColumnIndex) + 1
+            int retVal = row.Cells.Any(c => c != null && !string.IsNullOrEmpty(c.Text))
+                ? row.Cells.Where(c => c != null && !string.IsNullOrEmpty(c.Text)).Max(c => c.ColumnIndex) + 1
                 : 0;
 
             return retVal;
