@@ -27,27 +27,29 @@ namespace SiteDataFiller
 
         private void MailForm_Load(object sender, EventArgs e)
         {
-            txtSourceFile.Text = ConfigurationManager.AppSettings[SOURCE];
+            txtSourceFolder.Text = ConfigurationManager.AppSettings[SOURCE];
             txtDestinationFolder.Text = ConfigurationManager.AppSettings[DESTINATION];
+            LoadSourceFiles();
         }
 
-        private void btnBrowseFile_Click(object sender, EventArgs e)
+        private void btnBrowseSource_Click(object sender, EventArgs e)
         {
-            var dialog = new OpenFileDialog();
+            var dialog = new FolderBrowserDialog();
             if (DialogResult.OK == dialog.ShowDialog())
             {
-                txtSourceFile.Text = dialog.FileName;
+                txtSourceFolder.Text = dialog.SelectedPath;
 
+                LoadSourceFiles();
             }
         }
 
-        private void btnBrowseFolder_Click(object sender, EventArgs e)
+        private void btnBrowseDestination_Click(object sender, EventArgs e)
         {
             var dialog = new FolderBrowserDialog();
 
-            if (false == string.IsNullOrEmpty(txtSourceFile.Text))
+            if (false == string.IsNullOrEmpty(txtSourceFolder.Text))
             {
-                dialog.SelectedPath = new FileInfo(txtSourceFile.Text).DirectoryName;
+                dialog.SelectedPath = new DirectoryInfo(txtSourceFolder.Text).Parent.FullName;
             }
 
             if (DialogResult.OK == dialog.ShowDialog())
@@ -58,16 +60,16 @@ namespace SiteDataFiller
 
         private void btnExport_Click(object sender, EventArgs e)
         {
-            string sourcePath = txtSourceFile.Text;
-            string outputPath = txtDestinationFolder.Text;
+            string sourceFolder = txtSourceFolder.Text;
+            string outputFolder = txtDestinationFolder.Text;
 
-            if (string.IsNullOrEmpty(sourcePath))
+            if (string.IsNullOrEmpty(sourceFolder))
             {
                 MessageBox.Show("Please enter source data file location.");
                 return;
             }
 
-            if (string.IsNullOrEmpty(outputPath))
+            if (string.IsNullOrEmpty(outputFolder))
             {
                 MessageBox.Show("Please enter destination folder location.");
                 return;
@@ -75,16 +77,31 @@ namespace SiteDataFiller
 
             try
             {
-                UpdateAppSettings(SOURCE, sourcePath);
-                UpdateAppSettings(DESTINATION, outputPath);
+                UpdateAppSettings(SOURCE, sourceFolder);
+                UpdateAppSettings(DESTINATION, outputFolder);
 
-                var filler = new Filler();
-                var json = filler.GetJson(sourcePath);
-
-                foreach (var j in json)
+                foreach (string srcFile in clbSourceFiles.CheckedItems)
                 {
-                    string filePath = string.Format(@"{0}\{1}.json", outputPath, j.Key);
-                    File.WriteAllText(filePath, j.Value);
+                    string[] splits = srcFile.Split(new char[] { '.' });
+                    // data.en.xlsx
+                    if (splits.Count() < 2) continue;
+
+                    string lang = splits.ElementAt(splits.Count() - 2);
+
+                    string sourceFile = Path.Combine(sourceFolder, srcFile);
+                    string destFolder = Path.Combine(outputFolder, lang);
+
+                    if (false == Directory.Exists(destFolder))
+                        Directory.CreateDirectory(destFolder);
+
+                    var filler = new Filler();
+                    var json = filler.GetJson(sourceFile);
+
+                    foreach (var j in json)
+                    {
+                        string filePath = string.Format(@"{0}\{1}.json", destFolder, j.Key);
+                        File.WriteAllText(filePath, j.Value);
+                    }
                 }
 
                 if (DialogResult.Yes == MessageBox.Show("Site data successfully exported.\n\r\n\rDo you want to close the aplication?", "Success", MessageBoxButtons.YesNo))
@@ -141,7 +158,7 @@ namespace SiteDataFiller
                 return;
             }
 
-            txtSourceFile.Text = file;
+            txtSourceFolder.Text = file;
         }
 
         private void txtDestinationFolder_DragEnter(object sender, DragEventArgs e)
@@ -164,6 +181,26 @@ namespace SiteDataFiller
             }
 
             txtDestinationFolder.Text = dir;
+        }
+
+        private void LoadSourceFiles()
+        {
+            string sourceFolder = txtSourceFolder.Text;
+
+            if (false == string.IsNullOrEmpty(sourceFolder))
+            {
+                var di = new DirectoryInfo(sourceFolder);
+                var sourceFiles = di.EnumerateFiles()
+                    .Where(f => f.Extension == ".xlsx")
+                    .Where(f => f.Name.Count(c => c == '.') > 1)
+                    .Select(f => f.Name)
+                    .ToArray();
+
+                clbSourceFiles.Items.Clear();
+                clbSourceFiles.Items.AddRange(sourceFiles);
+                for (int i = 0; i < clbSourceFiles.Items.Count; i++)
+                    clbSourceFiles.SetItemChecked(i, true);
+            }
         }
 
     }
