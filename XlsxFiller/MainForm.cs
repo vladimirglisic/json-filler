@@ -139,7 +139,7 @@ namespace SiteDataFiller
             }
         }
 
-        private void txtSourceFile_DragEnter(object sender, DragEventArgs e)
+        private void txtSourceFolder_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop, false))
                 e.Effect = DragDropEffects.All;
@@ -147,19 +147,18 @@ namespace SiteDataFiller
                 e.Effect = DragDropEffects.None;
         }
 
-        private void txtSourceFile_DragDrop(object sender, DragEventArgs e)
+        private void txtSourceFolder_DragDrop(object sender, DragEventArgs e)
         {
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-            string file = files.FirstOrDefault();
+            string[] dirs = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            string dir = dirs.FirstOrDefault();
 
-            if (false == File.Exists(file)
-                || new FileInfo(file).Extension.ToLower() != XLSX)
+            if (false == Directory.Exists(dir))
             {
-                MessageBox.Show("File type should be .xlsx.");
+                MessageBox.Show("You should provide an existing directory path.");
                 return;
             }
 
-            txtSourceFolder.Text = file;
+            txtSourceFolder.Text = dir;
         }
 
         private void txtDestinationFolder_DragEnter(object sender, DragEventArgs e)
