@@ -187,21 +187,22 @@ namespace SiteDataFiller
         {
             string sourceFolder = txtSourceFolder.Text;
 
-            if (false == string.IsNullOrEmpty(sourceFolder))
-            {
-                var di = new DirectoryInfo(sourceFolder);
-                var sourceFiles = di.EnumerateFiles()
-                    .Where(f => f.Extension == ".xlsx")
-                    .Where(f => f.Name.Count(c => c == '.') > 1)
-                    .Select(f => f.Name)
-                    .ToArray();
+            if (true == string.IsNullOrEmpty(sourceFolder)) return;
+     
+            var di = new DirectoryInfo(sourceFolder);
 
-                clbSourceFiles.Items.Clear();
-                clbSourceFiles.Items.AddRange(sourceFiles);
-                for (int i = 0; i < clbSourceFiles.Items.Count; i++)
-                    clbSourceFiles.SetItemChecked(i, true);
-            }
+            if (false == di.Exists) return;
+            
+            var sourceFiles = di.EnumerateFiles()
+                .Where(f => f.Extension == ".xlsx")
+                .Where(f => f.Name.Count(c => c == '.') > 1)
+                .Select(f => f.Name)
+                .ToArray();
+
+            clbSourceFiles.Items.Clear();
+            clbSourceFiles.Items.AddRange(sourceFiles);
+            for (int i = 0; i < clbSourceFiles.Items.Count; i++)
+                clbSourceFiles.SetItemChecked(i, true);
         }
-
     }
 }
