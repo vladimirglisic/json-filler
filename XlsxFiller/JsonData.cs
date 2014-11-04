@@ -76,9 +76,9 @@ namespace SiteDataFiller
 
         #region Helpers
 
-        public object GetByKey(string key)
+        public object this[string key]
         {
-            return Data[key];
+            get { return Data[key]; }
         }
 
         public bool IsSimple()

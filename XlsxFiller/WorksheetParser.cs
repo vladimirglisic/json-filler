@@ -1,4 +1,5 @@
 ﻿using Excel;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,12 @@ namespace SiteDataFiller
 {
     public class WorksheetParser
     {
+        private static ILog myLog = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+    
         public static JsonDataType Parse(worksheet worksheet)
         {
-            JsonDataType type = WorksheetParser.ParseHeader(worksheet);
-            var data = WorksheetParser.ParseData(worksheet);
+            JsonDataType type = ParseHeader(worksheet);
+            var data = ParseData(worksheet);
 
             IList<JsonData> entities = data
                 .Select(d => new JsonData
@@ -52,6 +55,10 @@ namespace SiteDataFiller
                 ParentFieldName = fieldName,
                 HasParent = hasParent
             };
+
+            myLog.DebugFormat("Name: {0}", name);
+            myLog.DebugFormat("ParentName: {0}", parentName);
+            myLog.DebugFormat("ParentFieldName: {0}", fieldName);
 
             return type;
         }

@@ -30,6 +30,8 @@ namespace SiteDataFiller
             {
                 var parentEntity = parentType.GetById(childEntity.ParentId);
 
+                if (parentEntity == null) throw new ApplicationException(String.Format(@"Parent entity of type ""{0}"" with id={1} not found", childEntity.Type.ParentName, childEntity.ParentId));
+
                 (parentEntity.Data[childType.ParentFieldName] as List<JsonData>).Add(childEntity);
             }
         }

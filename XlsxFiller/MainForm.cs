@@ -23,6 +23,7 @@ namespace SiteDataFiller
         public MainForm()
         {
             InitializeComponent();
+            log4net.Config.XmlConfigurator.Configure();
         }
 
         private void MailForm_Load(object sender, EventArgs e)
