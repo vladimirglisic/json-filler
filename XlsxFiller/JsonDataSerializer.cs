@@ -33,7 +33,7 @@ namespace SiteDataFiller
             sb.AppendLine("{");
             foreach (var g in groups)
             {
-                bool isLastGroup = (g == groups.Last());
+                bool isLastGroup = (g.Key == groups.Last().Key);
                 string comma = isLastGroup ? "" : ",";
 
                 sb.AppendFormat("\"{0}\":", g.Key);
